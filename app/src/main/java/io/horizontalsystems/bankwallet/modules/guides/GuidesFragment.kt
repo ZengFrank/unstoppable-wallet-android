@@ -16,6 +16,8 @@ import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.entities.Guide
 import io.horizontalsystems.bankwallet.modules.guideview.GuideFragment
 import io.horizontalsystems.bankwallet.modules.transactions.FilterAdapter
+import io.horizontalsystems.bankwallet.modules.webview.Web3ViewActivity
+import io.horizontalsystems.bankwallet.modules.webview.WebViewActivity
 import kotlinx.android.synthetic.main.fragment_guides.*
 
 class GuidesFragment : BaseFragment(), GuidesAdapter.Listener, FilterAdapter.Listener {
@@ -46,8 +48,15 @@ class GuidesFragment : BaseFragment(), GuidesAdapter.Listener, FilterAdapter.Lis
     }
 
     override fun onItemClick(guide: Guide) {
-        val arguments = bundleOf(GuideFragment.guideUrlKey to guide.fileUrl)
-        findNavController().navigate(R.id.mainFragment_to_guideFragment, arguments, navOptions())
+        if(guide.url.isNullOrEmpty()){
+            val arguments = bundleOf(GuideFragment.guideUrlKey to guide.fileUrl)
+            findNavController().navigate(R.id.mainFragment_to_guideFragment, arguments, navOptions())
+        }else{
+            val arguments = bundleOf(Web3ViewActivity.guideWebUrlKey to guide.url)
+            //findNavController().navigate(R.id.action_mainFragment_to_web3ViewActivity, arguments, navOptions())
+            findNavController().navigate(R.id.action_mainFragment_to_web3Activity,arguments,navOptions())
+        }
+
     }
 
     private fun observeLiveData() {

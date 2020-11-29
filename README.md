@@ -21,5 +21,3 @@ More at [https://unstoppable.money](https://unstoppable.money)
 ## License
 
 This wallet is open source and available under the terms of the MIT Lincense.
-
-Zeng

@@ -6,6 +6,7 @@ import cash.z.ecc.android.sdk.Synchronizer
 import cash.z.ecc.android.sdk.block.CompactBlockProcessor
 import cash.z.ecc.android.sdk.ext.*
 import cash.z.ecc.android.sdk.tool.DerivationTool
+import cash.z.ecc.android.sdk.tool.WalletBirthdayTool
 import cash.z.ecc.android.sdk.validate.AddressType
 import io.horizontalsystems.bankwallet.core.*
 import io.horizontalsystems.bankwallet.entities.*
@@ -27,7 +28,8 @@ class ZcashAdapter(
 
     private val confirmationsThreshold = 10
     private val feeInZatoshi = 10_000L //0.0001 ZEC
-    private val lightWalletDHost = if (testMode) "lightwalletd.testnet.electriccoin.co" else "zcash.horizontalsystems.xyz"
+    private val saplingActivationHeight = if (testMode) 280_000 else 419_200
+    private val lightWalletDHost = if (testMode) "lightwalletd.testnet.electriccoin.co" else "lightwalletd.electriccoin.co"
     private val lightWalletDPort = 9067
 
     private val synchronizer: Synchronizer
@@ -43,17 +45,23 @@ class ZcashAdapter(
 
     init {
         val accountType = (wallet.account.type as? AccountType.Zcash)
-            ?: throw UnsupportedAccountException()
-        val isRestored = wallet.account.origin == AccountOrigin.Restored
-        seed = Mnemonic().toSeed(accountType.words)
-        val config = Initializer.Config { config ->
-            config.server(lightWalletDHost, lightWalletDPort)
-            config.setBirthdayHeight(accountType.birthdayHeight?.toInt(), isRestored)
-            config.alias = getValidAliasFromAccountId(wallet.account.id)
-            config.setSeed(seed)
-        }
+                ?: throw UnsupportedAccountException()
 
-        synchronizer = Synchronizer(Initializer(context, config))
+        seed = Mnemonic().toSeed(accountType.words)
+
+        val birthday = when (wallet.account.origin) {
+            AccountOrigin.Created -> null
+            AccountOrigin.Restored -> accountType.birthdayHeight?.toInt() ?: saplingActivationHeight
+        }
+        val nearestBirthday = WalletBirthdayTool.loadNearest(context, birthday)
+
+        val initializer = Initializer(context) { builder ->
+            builder.server(lightWalletDHost, lightWalletDPort)
+            builder.setSeed(seed)
+            builder.importedWalletBirthday(nearestBirthday.height)
+            builder.alias = getValidAliasFromAccountId(wallet.account.id)
+        }
+        synchronizer = Synchronizer(initializer)
         transactionsProvider = ZcashTransactionsProvider(synchronizer)
 
         synchronizer.status.distinctUntilChanged().collectWith(GlobalScope, ::onStatus)

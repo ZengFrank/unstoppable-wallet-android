@@ -6,7 +6,8 @@ data class Guide(
         val title: String,
         val updatedAt: Date,
         val imageUrl: String?,
-        val fileUrl: String
+        val fileUrl: String,
+        val url:String?
 )
 
 data class GuideCategory(

@@ -65,6 +65,15 @@
         <action
             android:id="@+id/mainFragment_to_walletConnectMainFragment"
             app:destination="@id/walletConnectMainFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_webViewActivity"
+            app:destination="@id/webViewActivity" />
+        <action
+            android:id="@+id/action_mainFragment_to_web3ViewActivity"
+            app:destination="@id/web3ViewActivity" />
+        <action
+            android:id="@+id/action_mainFragment_to_web3Activity"
+            app:destination="@id/web3Activity" />
     </fragment>
 
     <fragment
@@ -284,5 +293,20 @@
         tools:layout="@layout/fragment_wallet_connect_request"
         android:name="io.horizontalsystems.bankwallet.modules.walletconnect.request.WalletConnectSendEthereumTransactionRequestFragment"
         android:label="@string/WalletConnect_Request" />
+    <activity
+        android:id="@+id/webViewActivity"
+        android:name="io.horizontalsystems.bankwallet.modules.webview.WebViewActivity"
+        android:label="activity_web_view"
+        tools:layout="@layout/activity_web_view" />
+    <activity
+        android:id="@+id/web3ViewActivity"
+        android:name="io.horizontalsystems.bankwallet.modules.webview.Web3ViewActivity"
+        android:label="activity_web3_view"
+        tools:layout="@layout/activity_web3_view" />
+    <activity
+        android:id="@+id/web3Activity"
+        android:name="io.horizontalsystems.bankwallet.modules.webview.Web3Activity"
+        android:label="activity_web3"
+        tools:layout="@layout/activity_web3" />
 
 </navigation>
